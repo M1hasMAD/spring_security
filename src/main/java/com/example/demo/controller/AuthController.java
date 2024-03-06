@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.JwtRequestDto;
 import com.example.demo.dto.JwtResponseDto;
+import com.example.demo.dto.RegistrationUserDto;
 import com.example.demo.exception.AppError;
+import com.example.demo.service.AuthService;
 import com.example.demo.service.UserService;
 import com.example.demo.utils.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthController {
     private final UserService userService;
+    private final AuthService authService;
     private final JwtTokenUtils jwtTokenUtils;
     private final AuthenticationManager authenticationManager; // проверяет: логин и пароль есть в бд -> юзер есть в бд(зареган на сайте) -> даем токем
                                                                 // логина и пароля нет в бд -> юзера нет в бд(незареган на сайте) -> не делаем токен
@@ -37,5 +40,10 @@ public class AuthController {
         UserDetails userDetails = userService.loadUserByUsername(jwtRequest.getUsername()); // все ок(пароль сверился) -> нужно достать юзера из бд по имени из токена
         String token = jwtTokenUtils.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponseDto(token));
+    }
+
+    @PostMapping("/registration")
+    public ResponseEntity<?> createNewUser(@RequestBody RegistrationUserDto registrationUserDto) {
+        return authService.createNewUser(registrationUserDto);
     }
 }
