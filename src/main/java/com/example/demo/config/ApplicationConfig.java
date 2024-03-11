@@ -20,25 +20,25 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() { //получаем юзера из бд для проверки есть ли он вообще в бд
-        return username -> userRepository.findByEmail(username)
+        return username -> userRepository.findByEmail(username) // //имя юзера = почта юзера (спринг понимает только имя юзера, но по факту ищем и передаем почту)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
-        provider.setPasswordEncoder(passwordEncoder());
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception { // интерфейс для управления множества Provider'ов
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() { // механизм проверки(аутентификации)
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(); // проверяем (в бд):
+        provider.setUserDetailsService(userDetailsService()); // имя юзера
+        provider.setPasswordEncoder(passwordEncoder()); // и пароль
         return provider;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public PasswordEncoder passwordEncoder() { // шифрования паролей
+        return new BCryptPasswordEncoder(); // при помощи хеширования
     }
 }

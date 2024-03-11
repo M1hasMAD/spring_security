@@ -23,7 +23,7 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    public String extractUsernameFromToken(String token) { // достаем имя юзера из токена
+    public String extractUsernameFromToken(String token) { // достаем имя(почта) юзера из токена
         return extractClaims(token, Claims::getSubject);
     }
 
@@ -62,7 +62,7 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) { // валидация токена по имени юзера и сроку годности токена
         final String username = extractUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token); // имя(по факту почта) юзера из токена совпадает почте в бд и токен не просрочен
     }
 
     private boolean isTokenExpired(String token) {
