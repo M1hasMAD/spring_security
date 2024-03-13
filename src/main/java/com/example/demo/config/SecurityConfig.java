@@ -21,7 +21,7 @@ public class SecurityConfig {
 
     // создаем цепочку фильтров
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {//HttpSecurity-объект,дающий возможность настраивать безопасность для определенных http-запросов(по умолчанию прим. ко всем запросам)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {//HttpSecurity-дает возможность настраивать безоп-ть для определенных http-запросов(по умолчанию прим. ко всем запросам)
         http
                 .csrf(AbstractHttpConfigurer::disable) // выкл csrf-защиту ...
                 .authorizeHttpRequests // настраиваем правила доступа к ресурсам ->
@@ -32,7 +32,8 @@ public class SecurityConfig {
                 .sessionManagement // настраиваем управление сеансами
                         (session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //stateless - сеансы не будут создаваться и сост. сеанса не сохр. между сеансами
                 .authenticationProvider(authenticationProvider) // добавляем аутентификацию юзера
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // добавляем фильтр jwt-токена для аутентификации юзера перед фильтром UsernamePassword...
+                // UsernamePasswordAuthenticationFilter - фильтр данных из формы для авторизации(логин и пароль), обычно по адресу /login (слушает POST-запросы)
         return http.build();
     }
 }

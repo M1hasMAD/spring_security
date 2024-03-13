@@ -21,26 +21,28 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
 
-    public AuthenticationResponse register(RegisterRequest request) {
-        var user = User.builder()
+    public AuthenticationResponse register(RegisterRequest request) { // логика регистарции юзера
+        var user = User.builder() // билдим юзера
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(passwordEncoder.encode(request.getPassword())) // кодируем пароль
                 .role(Role.USER)
                 .build();
         userRepository.save(user);
-        var jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(user); // генерим токен
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
     }
 
+    // проверка данных, проверка юзера в бд и выдача токена при наличии его в бд
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        var user = userRepository.findByEmail(request.getEmail())
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken//проверка корректности данных, введенные юзером
+                (request.getEmail(), request.getPassword())); // данные верны -> идем дальше, иначе выкидывается AuthException
+        var user = userRepository.findByEmail(request.getEmail()) // уже ищем в бд
                 .orElseThrow(() -> new UsernameNotFoundException("User not found #2"));
-        var jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
