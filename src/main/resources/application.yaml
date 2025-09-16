@@ -20,3 +20,6 @@ jwt:
 
 #      settings:
 #        web-allow-others: false
+
+  main:
+    allow-circular-references: true
